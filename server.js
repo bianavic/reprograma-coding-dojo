@@ -59,6 +59,10 @@ servidor.patch('/pokemons/treinar/:id', (request, response) => {
       if(!pokemon) { response.sendStatus(404) }
       else { response.send(pokemon) }
     })
+    .then(nivelAnterior => {
+      if(nivelAnterior > 150) {response.sendStatus(500)}
+      else {response.send(nivelAnterior)}
+    })
     .catch(error => {
       if(error.name === "MongoError" || error.name === "CastError"){
         response.sendStatus(400)
