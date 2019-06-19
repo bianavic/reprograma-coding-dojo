@@ -39,7 +39,7 @@ const treinar = async (id, datas) => {
   const pokemon = await pokemonsModel.findById(id)
   const nivelAnterior = pokemon.nivel
 
-  if (nivelAnterior >= 150) {
+  if ((nivelAnterior + calcularNivel)>= 150) {
     throw new Error('deu ruim')
   }
 
