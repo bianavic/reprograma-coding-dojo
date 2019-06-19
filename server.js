@@ -12,7 +12,7 @@ servidor.get('/', (request, response) => {
   response.send('Olá, mundo!')
 })
 
-servidor.get('/pokemons', async (request, response) => {
+servidor.get('/pokemons', (request, response) => {
   controller.getAll()
     .then(pokemons => response.send(pokemons))
 })
@@ -59,10 +59,7 @@ servidor.patch('/pokemons/treinar/:id', (request, response) => {
       if(!pokemon) { response.sendStatus(404) }
       else { response.send(pokemon) }
     })
-    .then(nivelAnterior => {
-      if(nivelAnterior > 150) {response.sendStatus(500)}
-      else {response.send(nivelAnterior)}
-    })
+
     .catch(error => {
       if(error.name === "MongoError" || error.name === "CastError"){
         response.sendStatus(400)
