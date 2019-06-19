@@ -1,11 +1,13 @@
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
-const servidor = express()
 const controller = require('./PokemonsController')
+const params = require('params')
+const parametrosPermitidos = require('./parametrosPermitidos')
+const servidor = express()
 const PORT = 3000
 const logger = (request, response, next) => {
-  console.log(`Request type: ${request.method} to ${request.originalUrl}`)
+  console.log(`${new Date().toISOString()} Request type: ${request.method} to ${request.originalUrl}`)
 
   response.on('finish', () => {
     console.log(`${response.statusCode} ${response.statusMessage};`)
@@ -48,7 +50,7 @@ servidor.get('/pokemons/:pokemonId', (request, response) => {
 
 servidor.patch('/pokemons/:id', (request, response) => {
   const id = request.params.id
-  controller.update(id, request.body)
+  controller.update(id, params(request.body).only(parametrosPermitidos.update))
     .then(pokemon => {
       if(!pokemon) { response.sendStatus(404) }
       else { response.send(pokemon) }
@@ -64,7 +66,7 @@ servidor.patch('/pokemons/:id', (request, response) => {
 
 servidor.patch('/pokemons/treinar/:id', (request, response) => {
   const id = request.params.id
-  controller.treinar(id, request.body)
+  controller.treinar(id, request.body.only(parametrosPermitidos.treinar))
     .then(pokemon => {
       if(!pokemon) { response.sendStatus(404) }
       else { response.send(pokemon) }
@@ -79,7 +81,7 @@ servidor.patch('/pokemons/treinar/:id', (request, response) => {
 })
 
 servidor.post('/pokemons', (request, response) => {
-  controller.add(request.body)
+  controller.add(request.body.only(parametrosPermitidos.add))
     .then(pokemon => {
       const _id = pokemon._id
       response.send(_id)
