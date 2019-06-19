@@ -3,12 +3,12 @@ const pokemonsModel = require('./PokemonsSchema')
 
 connect()
 
-const calcularNivel = datas => {
+const calcularNivel = (datas, nivelAnterior) => {
   const diff = Math.abs(new Date(datas.dataInicio) - new Date(datas.dataFim)) / 3600000
   return diff / 4 + nivelAnterior;
 }
 
-const getAll = async () => {
+const getAll = () => {
   return pokemonsModel.find((error, pokemons) => {
     return pokemons
   })
@@ -36,10 +36,10 @@ const update = (id, pokemon) => {
 }
 
 const treinar = async (id, datas) => {
-  const pokemon = await pokemonsModel.findById(id, 'nivel')
+  const pokemon = await pokemonsModel.findById(id)
   const nivelAnterior = pokemon.nivel
 
-  if(nivelAnterior >= 150) {
+  if (nivelAnterior >= 150) {
     throw new Error('deu ruim')
   }
 
