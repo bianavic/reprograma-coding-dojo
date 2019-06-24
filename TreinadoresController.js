@@ -1,5 +1,6 @@
 const { connect } = require('./PokemonsApiRepository')
 const treinadoresModel = require('./TreinadoresSchema')
+const { pokemonsModel } = require('./PokemonsSchema')
 
 connect()
 
@@ -30,10 +31,19 @@ const update = (id, treinador) => {
   )
 }
 
+const addPokemon = async (treinadorId, pokemon) => {
+  const treinador = await getById(treinadorId)
+  const novoPokemon = new pokemonsModel(pokemon)
+
+  treinador.pokemons.push(novoPokemon)
+  return treinador.save()
+}
+
 module.exports = {
   getAll,
   getById,
   add,
   remove,
-  update
+  update,
+  addPokemon
 }
