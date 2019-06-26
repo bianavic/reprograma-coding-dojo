@@ -5,7 +5,7 @@ const servidor = express()
 const treinadoresController = require('./TreinadoresController')
 const params = require('params')
 const parametrosPermitidos = require('./parametrosPermitidos')
-const PORT = 3001
+const PORT = 3000
 const logger = (request, response, next) => {
   console.log(`${new Date().toISOString()} Request type: ${request.method} to ${request.originalUrl}`)
 
@@ -20,28 +20,8 @@ servidor.use(cors())
 servidor.use(bodyParser.json())
 servidor.use(logger)
 
-servidor.get('/treinadores/pokemons', async (request, response) => {
-  treinadoresController.getAll()
-    .then(treinadores => response.send(treinadores))
-})
-
-servidor.get('/pokemons/:pokemonId', (request, response) => {
-  const pokemonId = request.params.pokemonId
-  pokemonsController.getById(pokemonId)
-    .then(pokemon => {
-      if(!pokemon){
-        response.sendStatus(404)
-      } else {
-        response.send(pokemon)
-      }
-    })
-    .catch(error => {
-      if(error.name === "CastError"){
-        response.sendStatus(400)
-      } else {
-        response.sendStatus(500)
-      }
-    })
+servidor.get('/', (request, response) => {
+  response.send('Olá, mundo!')
 })
 
 // Rotas TREINADORES
@@ -135,6 +115,50 @@ servidor.patch('/treinadores/:treinadorId/treinar/:pokemonId', (request, respons
       }
     })
 })
+
+servidor.get('/treinadores/:treinadorId/pokemons', async (request, response) => {
+  const treinadorId = request.params.treinadorId
+  treinadoresController.getPokemons(treinadorId)
+    .then(pokemons => response.send(pokemons))
+})
+
+servidor.patch('/treinadores/:treinadorId/pokemon/:pokemonId', (request, response) => {
+  const treinadorId = request.params.treinadorId
+  const pokemonId = request.params.pokemonId
+  treinadoresController.updatePokemon(treinadorId, pokemonId, request.body)
+    .then(pokemon => {
+      if(!pokemon) { response.sendStatus(404) }
+      else { response.send(pokemon) }
+    })
+    .catch(error => {
+      if(error.name === "MongoError" || error.name === "CastError"){
+        response.sendStatus(400)
+      } else {
+        response.sendStatus(500)
+      }
+    })
+})
+
+servidor.get('/treinadores/:treinadorId/pokemons/:pokemonId', (request, response) => {
+  const treinadorId = request.params.treinadorId
+  const pokemonId = request.params.pokemonId
+  treinadoresController.getByPokemonId(treinadorId, pokemonId)
+    .then(pokemon => {
+      if(!pokemon){
+        response.sendStatus(404)
+      } else {
+        response.send(pokemon)
+      }
+    })
+    .catch(error => {
+      if(error.name === "CastError"){
+        response.sendStatus(400)
+      } else {
+        response.sendStatus(500)
+      }
+    })
+})
+
 
 servidor.listen(PORT)
 console.info(`Rodando na porta ${PORT}`)
