@@ -59,6 +59,26 @@ const treinarPokemon = async (treinadorId, pokemonId, datas) => {
   return treinador.save()
 }
 
+const getPokemons = async treinadorId => {
+  const treinador = await getById(treinadorId)
+  return treinador.pokemons
+}
+
+const updatePokemon = (treinadorId, pokemonId, pokemon) => {
+  return treinadoresModel.findOneAndUpdate(
+    { _id: treinadorId, "pokemons._id": pokemonId },
+    { $set: { "pokemons.$": { ...pokemon, _id: pokemonId } } },
+    { new: true }
+  )
+}
+
+const getByPokemonId = async (treinadorId, pokemonId) => {
+  const treinador = await getById(treinadorId)
+  return treinador.pokemons.find(pokemon => {
+    return pokemon._id == pokemonId
+  })
+}
+
 module.exports = {
   getAll,
   getById,
@@ -66,5 +86,8 @@ module.exports = {
   remove,
   update,
   addPokemon,
-  treinarPokemon
+  treinarPokemon,
+  getPokemons,
+  updatePokemon,
+  getByPokemonId
 }
