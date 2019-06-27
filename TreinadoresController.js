@@ -1,47 +1,53 @@
-const { connect } = require('./PokemonsApiRepository')
-const treinadoresModel = require('./TreinadoresSchema')
-const { pokemonsModel } = require('./PokemonsSchema')
+const {
+  connect
+} = require('./PokemonsApiRepository')
+const TreinadoresModel = require('./TreinadoresSchema')
+const {
+  PokemonsModel
+} = require('./PokemonsSchema')
 const LIMITE_NIVEL_POKEMON = 150
 
 connect()
 
 const calcularNivel = (datas, nivelAnterior) => {
   const diff = Math.abs(new Date(datas.dataInicio) - new Date(datas.dataFim)) / 3600000
-  const novoNivel = diff / 4 + nivelAnterior;
+  const novoNivel = diff / 4 + nivelAnterior
 
-  return novoNivel >= LIMITE_NIVEL_POKEMON ? LIMITE_NIVEL_POKEMON : novoNivel;
+  return novoNivel >= LIMITE_NIVEL_POKEMON ? LIMITE_NIVEL_POKEMON : novoNivel
 }
 
 const getAll = () => {
-  return treinadoresModel.find((error, treinadores) => {
+  return TreinadoresModel.find((error, treinadores) => {
     return treinadores
   })
 }
 
 const getById = (id) => {
-  return treinadoresModel.findById(id)
+  return TreinadoresModel.findById(id)
 }
 
 const add = (treinador) => {
-  const novoTreinador = new treinadoresModel(treinador)
+  const novoTreinador = new TreinadoresModel(treinador)
   return novoTreinador.save()
 }
 
 const remove = (id) => {
-  return treinadoresModel.findByIdAndDelete(id)
+  return TreinadoresModel.findByIdAndDelete(id)
 }
 
 const update = (id, treinador) => {
-  return treinadoresModel.findByIdAndUpdate(
-    id,
-    { $set: treinador },
-    { new: true },
+  return TreinadoresModel.findByIdAndUpdate(
+    id, {
+      $set: treinador
+    }, {
+      new: true
+    }
   )
 }
 
 const addPokemon = async (treinadorId, pokemon) => {
   const treinador = await getById(treinadorId)
-  const novoPokemon = new pokemonsModel(pokemon)
+  const novoPokemon = new PokemonsModel(pokemon)
 
   treinador.pokemons.push(novoPokemon)
   return treinador.save()
@@ -49,7 +55,7 @@ const addPokemon = async (treinadorId, pokemon) => {
 
 const treinarPokemon = async (treinadorId, pokemonId, datas) => {
   const treinador = await getById(treinadorId)
-  const pokemon = treinador.pokemons.find(pokemon => pokemon._id == pokemonId)
+  const pokemon = treinador.pokemons.find(pokemon => pokemon._id === pokemonId)
 
   if (pokemon.nivel >= LIMITE_NIVEL_POKEMON) {
     throw new Error('Seu pokémon já é forte o suficiente!')
@@ -65,17 +71,25 @@ const getPokemons = async treinadorId => {
 }
 
 const updatePokemon = (treinadorId, pokemonId, pokemon) => {
-  return treinadoresModel.findOneAndUpdate(
-    { _id: treinadorId, "pokemons._id": pokemonId },
-    { $set: { "pokemons.$": { ...pokemon, _id: pokemonId } } },
-    { new: true }
-  )
+  return TreinadoresModel.findOneAndUpdate({
+    _id: treinadorId,
+    'pokemons._id': pokemonId
+  }, {
+    $set: {
+      'pokemons.$': {
+        ...pokemon,
+        _id: pokemonId
+      }
+    }
+  }, {
+    new: true
+  })
 }
 
 const getByPokemonId = async (treinadorId, pokemonId) => {
   const treinador = await getById(treinadorId)
   return treinador.pokemons.find(pokemon => {
-    return pokemon._id == pokemonId
+    return pokemon._id === pokemonId
   })
 }
 

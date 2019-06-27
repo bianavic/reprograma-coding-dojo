@@ -35,14 +35,14 @@ servidor.get('/treinadores/:treinadorId', (request, response) => {
   const treinadorId = request.params.treinadorId
   treinadoresController.getById(treinadorId)
     .then(treinador => {
-      if(!treinador){
+      if (!treinador) {
         response.sendStatus(404)
       } else {
         response.send(treinador)
       }
     })
     .catch(error => {
-      if(error.name === "CastError"){
+      if (error.name === 'CastError') {
         response.sendStatus(400)
       } else {
         response.sendStatus(500)
@@ -54,11 +54,14 @@ servidor.patch('/treinadores/:id', (request, response) => {
   const id = request.params.id
   treinadoresController.update(id, request.body)
     .then(treinador => {
-      if(!treinador) { response.sendStatus(404) }
-      else { response.send(treinador) }
+      if (!treinador) {
+        response.sendStatus(404)
+      } else {
+        response.send(treinador)
+      }
     })
     .catch(error => {
-      if(error.name === "MongoError" || error.name === "CastError"){
+      if (error.name === 'MongoError' || error.name === 'CastError') {
         response.sendStatus(400)
       } else {
         response.sendStatus(500)
@@ -73,7 +76,7 @@ servidor.post('/treinadores', (request, response) => {
       response.send(_id)
     })
     .catch(error => {
-      if(error.name === "ValidationError"){
+      if (error.name === 'ValidationError') {
         response.sendStatus(400)
       } else {
         response.sendStatus(500)
@@ -89,7 +92,7 @@ servidor.post('/treinadores/adicionar-pokemon/:treinadorId', (request, response)
       response.send(_id)
     })
     .catch(error => {
-      if(error.name === "ValidationError"){
+      if (error.name === 'ValidationError') {
         response.sendStatus(400)
       } else {
         console.log(error)
@@ -107,7 +110,7 @@ servidor.patch('/treinadores/:treinadorId/treinar/:pokemonId', (request, respons
       response.send(_id)
     })
     .catch(error => {
-      if(error.name === "ValidationError"){
+      if (error.name === 'ValidationError') {
         response.sendStatus(400)
       } else {
         console.log(error)
@@ -127,11 +130,14 @@ servidor.patch('/treinadores/:treinadorId/pokemon/:pokemonId', (request, respons
   const pokemonId = request.params.pokemonId
   treinadoresController.updatePokemon(treinadorId, pokemonId, request.body)
     .then(pokemon => {
-      if(!pokemon) { response.sendStatus(404) }
-      else { response.send(pokemon) }
+      if (!pokemon) {
+        response.sendStatus(404)
+      } else {
+        response.send(pokemon)
+      }
     })
     .catch(error => {
-      if(error.name === "MongoError" || error.name === "CastError"){
+      if (error.name === 'MongoError' || error.name === 'CastError') {
         response.sendStatus(400)
       } else {
         response.sendStatus(500)
@@ -144,21 +150,20 @@ servidor.get('/treinadores/:treinadorId/pokemons/:pokemonId', (request, response
   const pokemonId = request.params.pokemonId
   treinadoresController.getByPokemonId(treinadorId, pokemonId)
     .then(pokemon => {
-      if(!pokemon){
+      if (!pokemon) {
         response.sendStatus(404)
       } else {
         response.send(pokemon)
       }
     })
     .catch(error => {
-      if(error.name === "CastError"){
+      if (error.name === 'CastError') {
         response.sendStatus(400)
       } else {
         response.sendStatus(500)
       }
     })
 })
-
 
 servidor.listen(PORT)
 console.info(`Rodando na porta ${PORT}`)

@@ -1,17 +1,20 @@
-const mongoose = require("mongoose");
-const MONGO_URL = "mongodb://localhost:27017/pokemonsApi";
+const mongoose = require('mongoose')
+const MONGO_URL = 'mongodb://localhost:27017/pokemonsApi'
 
-function connect () {
-  mongoose.connect(MONGO_URL,
-    { useNewUrlParser: true },
+function connect() {
+  mongoose.connect(MONGO_URL, {
+      useNewUrlParser: true
+    },
     function (error) {
-      if(error) {
-        console.error("Algo de errado não está certo: ", error)
+      if (error) {
+        console.error('Algo de errado não está certo: ', error)
       } else {
-        console.log("Conectado no mongoDB.")
+        console.log('Conectado no mongoDB.')
       }
     }
-  );
+  )
 }
 
-module.exports = { connect }
+module.exports = {
+  connect
+}
