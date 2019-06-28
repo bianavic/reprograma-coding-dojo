@@ -5,7 +5,8 @@ const servidor = express()
 const treinadoresController = require('./TreinadoresController')
 const params = require('params')
 const parametrosPermitidos = require('./parametrosPermitidos')
-const PORT = 3000
+const PORT = process.env.PORT || 3000
+const jwt = require('jsonwebtoken')
 const logger = (request, response, next) => {
   console.log(`${new Date().toISOString()} Request type: ${request.method} to ${request.originalUrl}`)
 
@@ -27,22 +28,39 @@ servidor.get('/', (request, response) => {
 // Rotas TREINADORES
 
 servidor.get('/treinadores', async (request, response) => {
-  treinadoresController.getAll()
+  const authHeader = request.get('authorization').split(' ')[1]
+  let auth = false
+
+  if (authHeader) {
+    jwt.verify(authHeader, process.env.PRIVATE_KEY, function(error, decoded) {
+      if (error) {
+        response.send(401)
+      } else {
+        auth = true
+      }
+    })
+  } else {
+    response.send(401)
+  }
+
+  if (auth) {
+    treinadoresController.getAll()
     .then(treinadores => response.send(treinadores))
+  }
 })
 
 servidor.get('/treinadores/:treinadorId', (request, response) => {
   const treinadorId = request.params.treinadorId
   treinadoresController.getById(treinadorId)
     .then(treinador => {
-      if (!treinador) {
+      if(!treinador){
         response.sendStatus(404)
       } else {
         response.send(treinador)
       }
     })
     .catch(error => {
-      if (error.name === 'CastError') {
+      if(error.name === "CastError"){
         response.sendStatus(400)
       } else {
         response.sendStatus(500)
@@ -54,14 +72,11 @@ servidor.patch('/treinadores/:id', (request, response) => {
   const id = request.params.id
   treinadoresController.update(id, request.body)
     .then(treinador => {
-      if (!treinador) {
-        response.sendStatus(404)
-      } else {
-        response.send(treinador)
-      }
+      if(!treinador) { response.sendStatus(404) }
+      else { response.send(treinador) }
     })
     .catch(error => {
-      if (error.name === 'MongoError' || error.name === 'CastError') {
+      if(error.name === "MongoError" || error.name === "CastError"){
         response.sendStatus(400)
       } else {
         response.sendStatus(500)
@@ -76,9 +91,10 @@ servidor.post('/treinadores', (request, response) => {
       response.send(_id)
     })
     .catch(error => {
-      if (error.name === 'ValidationError') {
+      if(error.name === "ValidationError"){
         response.sendStatus(400)
       } else {
+        console.log(error)
         response.sendStatus(500)
       }
     })
@@ -92,7 +108,7 @@ servidor.post('/treinadores/adicionar-pokemon/:treinadorId', (request, response)
       response.send(_id)
     })
     .catch(error => {
-      if (error.name === 'ValidationError') {
+      if(error.name === "ValidationError"){
         response.sendStatus(400)
       } else {
         console.log(error)
@@ -110,7 +126,7 @@ servidor.patch('/treinadores/:treinadorId/treinar/:pokemonId', (request, respons
       response.send(_id)
     })
     .catch(error => {
-      if (error.name === 'ValidationError') {
+      if(error.name === "ValidationError"){
         response.sendStatus(400)
       } else {
         console.log(error)
@@ -130,14 +146,11 @@ servidor.patch('/treinadores/:treinadorId/pokemon/:pokemonId', (request, respons
   const pokemonId = request.params.pokemonId
   treinadoresController.updatePokemon(treinadorId, pokemonId, request.body)
     .then(pokemon => {
-      if (!pokemon) {
-        response.sendStatus(404)
-      } else {
-        response.send(pokemon)
-      }
+      if(!pokemon) { response.sendStatus(404) }
+      else { response.send(pokemon) }
     })
     .catch(error => {
-      if (error.name === 'MongoError' || error.name === 'CastError') {
+      if(error.name === "MongoError" || error.name === "CastError"){
         response.sendStatus(400)
       } else {
         response.sendStatus(500)
@@ -150,16 +163,32 @@ servidor.get('/treinadores/:treinadorId/pokemons/:pokemonId', (request, response
   const pokemonId = request.params.pokemonId
   treinadoresController.getByPokemonId(treinadorId, pokemonId)
     .then(pokemon => {
-      if (!pokemon) {
+      if(!pokemon){
         response.sendStatus(404)
       } else {
         response.send(pokemon)
       }
     })
     .catch(error => {
-      if (error.name === 'CastError') {
+      if(error.name === "CastError"){
         response.sendStatus(400)
       } else {
+        response.sendStatus(500)
+      }
+    })
+})
+
+servidor.post('/treinadores/login', (request, response) => {
+  treinadoresController.login(request.body)
+    .then(loginResponse => {
+      response.send(loginResponse)
+    })
+    .catch(error => {
+      if(error.name === "ValidationError"){
+        console.log(error)
+        response.sendStatus(400)
+      } else {
+        console.log(error)
         response.sendStatus(500)
       }
     })
